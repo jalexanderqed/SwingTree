@@ -12,7 +12,7 @@ public class MainPanel extends JPanel{
     private ArrayList<Vertex> vertices;
 
     private static final int MULT = Globals.drawMultiplier;
-    private static final int RADIUS = 5;
+    private static final int RADIUS = Globals.nodeRadius;
     private static final Color VERTEX_COLOR = Color.BLACK;
     private static final Color EDGE_COLOR = Color.BLACK;
     public Color backgroundColor = Color.WHITE;

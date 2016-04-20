@@ -69,19 +69,26 @@ public class Vertex {
         for(VertexEdgePair p : neighbors){
             NewtonVector vector = new NewtonVector(p.vertex.state, s);
             double displacement = vector.length() - p.edge.restLength;
+            /*
+            System.out.println("Length: " + vector.length());
+            System.out.println("Rest Length: " + p.edge.restLength);
+            System.out.println("Displacement: " + displacement);
+            */
             vector.normalize();
             fx -= p.edge.k * displacement * vector.x + p.edge.b * vector.dx;
             fy -= p.edge.k * displacement * vector.y + p.edge.b * vector.dy;
         }
 
-        for(Vertex v : Globals.vertices){
-            if(v == this) continue;
+        if(Globals.doRepulsion) {
+            for (Vertex v : Globals.vertices) {
+                if (v == this) continue;
 
-            NewtonVector vector = new NewtonVector(v.state, state);
-            double dist = vector.length();
-            double multiplier = Globals.repulsiveMultiplier / (dist * dist);
-            fx += vector.x * multiplier;
-            fy += vector.y * multiplier;
+                NewtonVector vector = new NewtonVector(v.state, state);
+                double dist = vector.length();
+                double multiplier = Globals.repulsiveMultiplier / (dist * dist);
+                fx += vector.x * multiplier;
+                fy += vector.y * multiplier;
+            }
         }
 
         if(Globals.gravity) fy += Globals.gravityConstant * mass;
