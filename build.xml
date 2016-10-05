@@ -1,0 +1,29 @@
+<project default="compile">
+
+    <property environment="env"/>
+    <property name="packagePrefix" value="ninja.jalexander"/>
+
+    <path id="project.class.path">
+        <pathelement location="build"/>
+    </path>
+
+    <target name="compile" description="compile the projects">
+        <mkdir dir="build"/>
+        <javac srcdir="src" destdir="build" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
+
+    <target name="run" depends="compile" description="run the project">
+        <!-- You can use exec here, depending on your needs -->
+        <java classname="${packagePrefix}.Main" classpathref="project.class.path" fork="true">
+            <arg line="${args}"/>
+        </java>
+    </target>
+
+
+    <target name="clean" description="delete unnecessary files and directories">
+        <delete dir="build" quiet="true"/>
+    </target>
+
+</project>
