@@ -9,12 +9,17 @@ import java.util.ArrayList;
 public class MainFrame extends JFrame {
     public MainPanel panel;
 
-    public MainFrame(ArrayList<IntPair> graph, ArrayList<Vertex> vertices){
+    public MainFrame(){
         super("Swing Tree");
-        panel = new MainPanel(graph, vertices);
-        this.add(panel);
-        this.setSize(800, 800);
+        this.setSize(Main.globals.pixWidth, Main.globals.pixHeight);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
+        this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        Main.globals.setPixSize(this.getWidth(), this.getHeight());
+    }
+
+    public void addComponents(ArrayList<IntPair> graph, ArrayList<Vertex> vertices){
+        panel = new MainPanel(graph, vertices);
+        this.add(panel);
     }
 }

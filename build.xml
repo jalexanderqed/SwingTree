@@ -14,15 +14,29 @@
         </javac>
     </target>
 
-    <target name="run" depends="compile" description="run the project">
+    <target name="run" depends="compile" description="run the project in default mode">
         <!-- You can use exec here, depending on your needs -->
         <java classname="${packagePrefix}.Main" classpathref="project.class.path" fork="true">
-            <arg line="${args}"/>
+            <arg value="${arg0}"/>
+        </java>
+    </target>
+
+    <target name="runWave" depends="compile" description="run the wave simulation">
+        <!-- You can use exec here, depending on your needs -->
+        <java classname="${packagePrefix}.Main" classpathref="project.class.path" fork="true">
+            <arg value="wave"/>
+        </java>
+    </target>
+
+    <target name="runTree" depends="compile" description="run the swinging tree simulation">
+        <!-- You can use exec here, depending on your needs -->
+        <java classname="${packagePrefix}.Main" classpathref="project.class.path" fork="true">
+            <arg value="tree"/>
         </java>
     </target>
 
 
-    <target name="clean" description="delete unnecessary files and directories">
+    <target name="clean" description="delete compiled files and directories">
         <delete dir="build" quiet="true"/>
     </target>
 

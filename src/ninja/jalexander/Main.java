@@ -7,14 +7,47 @@ import java.util.ArrayList;
 
 public class Main {
 
+    public static int simType;
+    public static Globals globals;
+
+    public static int TREE = 0;
+    public static int WAVE = 1;
+
     public static void main(String[] args) {
+        if(args.length > 0){
+            if(args[0].equals("tree")){
+                simType = TREE;
+            }
+            else if(args[0].equals("wave")){
+                simType = WAVE;
+            }
+        }
+        else{
+            simType = TREE;
+        }
+
+        if(simType == TREE){
+            globals = new TreeGlobals();
+        }
+        else {
+            globals = new TransverseWaveGlobals();
+        }
+
+        MainFrame frame = new MainFrame();
+
         ArrayList<IntPair> graph = new ArrayList<IntPair>();
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-        Globals.vertices = vertices;
+        globals.vertices = vertices;
 
-        initLinear(graph, vertices);
+        if(simType == TREE){
+            initTree(graph, vertices);
+        }
+        else {
+            initLinear(graph, vertices);
+        }
 
-        MainFrame frame = new MainFrame(graph, vertices);
+        frame.addComponents(graph, vertices);
+
         frame.panel.repaint();
         try{
             Thread.sleep(1000);
@@ -49,35 +82,35 @@ public class Main {
     }
 
     public static void initLinear(ArrayList<IntPair> graph, ArrayList<Vertex> vertices){
-        double stepSize = Globals.unitWidth / (Globals.numLinearPoints + 1.0);
-        double height = Globals.unitHeight * 0.5;
+        double stepSize = globals.unitWidth / (globals.numLinearPoints + 1.0);
+        double height = globals.unitHeight * 0.5;
         int startIndex = vertices.size();
 
-        Vertex last = new Vertex(Globals.defaultWeight);
+        Vertex last = new Vertex(globals.defaultWeight);
         last.state.x = stepSize;
         last.state.y = height;
         vertices.add(last);
-        Globals.fixedPoints.add(last);
+        globals.fixedPoints.add(last);
 
-        for(int i = 1; i < Globals.numLinearPoints; i++){
+        for(int i = 1; i < globals.numLinearPoints; i++){
             int index = vertices.size();
-            Vertex v = new Vertex(Globals.defaultWeight);
+            Vertex v = new Vertex(globals.defaultWeight);
             v.state.x = stepSize * (i + 1);
             v.state.y = height;
             vertices.add(v);
 
-            Edge edge = new Edge(stepSize * Globals.restLengthMultiplier, Globals.defaultK, Globals.defaultB);
+            Edge edge = new Edge(stepSize * globals.restLengthMultiplier, globals.defaultK, globals.defaultB);
             v.addNeighbor(new VertexEdgePair(last, edge));
             last.addNeighbor(new VertexEdgePair(v, edge));
             graph.add(new IntPair(index, index - 1));
             last = v;
         }
-        Globals.fixedPoints.add(last);
+        globals.fixedPoints.add(last);
 
-        if(Globals.initForWave){
+        if(globals.initForWave){
             initSineWave(startIndex,
-                    (int)Math.round(Globals.numLinearPoints * Globals.initSineMultiplier),
-                    Globals.numLinearPoints * stepSize * Globals.initSineMultiplier * Globals.initSineHeightMultiplier,
+                    (int)Math.round(globals.numLinearPoints * globals.initSineMultiplier),
+                    globals.numLinearPoints * stepSize * globals.initSineMultiplier * globals.initSineHeightMultiplier,
                     vertices);
         }
     }
@@ -91,25 +124,25 @@ public class Main {
     }
 
     public static void initTree(ArrayList<IntPair> graph, ArrayList<Vertex> vertices){
-        int rootIndex = initVertex(1, Globals.unitWidth / 2, Globals.unitHeight * Globals.heightMultiplier, graph, vertices);
-        Globals.fixedPoints.add(vertices.get(rootIndex));
+        int rootIndex = initVertex(1, globals.unitWidth / 2, globals.unitHeight * globals.heightMultiplier, graph, vertices);
+        globals.fixedPoints.add(vertices.get(rootIndex));
     }
 
     public static int initVertex(int depth, double x, double y, ArrayList<IntPair> graph, ArrayList<Vertex> vertices){
-        Vertex v = new Vertex(Globals.defaultWeight);
+        Vertex v = new Vertex(globals.defaultWeight);
         v.state.x = x;
         v.state.y = y;
         int myPos = vertices.size();
         vertices.add(v);
-        if(depth == Globals.treeDepth) return myPos;
+        if(depth == globals.treeDepth) return myPos;
 
-        double eachWidth = Globals.unitWidth / Math.pow(Globals.branchFactor, depth);
-        double myWidth = (Globals.branchFactor + 1) * eachWidth;
+        double eachWidth = globals.unitWidth / Math.pow(globals.branchFactor, depth);
+        double myWidth = (globals.branchFactor + 1) * eachWidth;
 
-        for(int i = 0; i < Globals.branchFactor; i++){
-            int nextIndex = initVertex(depth + 1, x - myWidth / 2 + ((i + 1) * eachWidth), y + Globals.defaultEdgeLength, graph, vertices);
+        for(int i = 0; i < globals.branchFactor; i++){
+            int nextIndex = initVertex(depth + 1, x - myWidth / 2 + ((i + 1) * eachWidth), y + globals.defaultEdgeLength, graph, vertices);
             Vertex next = vertices.get(nextIndex);
-            Edge edge = new Edge(Globals.defaultEdgeLength, Globals.defaultK, Globals.defaultB);
+            Edge edge = new Edge(globals.defaultEdgeLength, globals.defaultK, globals.defaultB);
             v.addNeighbor(new VertexEdgePair(next, edge));
             next.addNeighbor(new VertexEdgePair(v, edge));
             graph.add(new IntPair(nextIndex, myPos));
@@ -119,11 +152,11 @@ public class Main {
 
     public static void update(ArrayList<Vertex> vertices, double dt){
         for(Vertex v : vertices){
-            if(!Globals.fixedPoints.contains(v))
+            if(!globals.fixedPoints.contains(v))
                 v.update(dt);
         }
         for(Vertex v : vertices){
-            if(!Globals.fixedPoints.contains(v))
+            if(!globals.fixedPoints.contains(v))
                 v.flip();
         }
     }
